@@ -1,11 +1,29 @@
 const TelegramBot = require('node-telegram-bot-api');
+const axios = require('axios');
 
 const token = 'YOUR_TELEGRAM_BOT_TOKEN';
+const openai_api_key = 'YOUR_OPENAI_API_KEY';
 
 const bot = new TelegramBot(token, { polling: true });
 
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
 
-  bot.sendMessage(chatId, 'Hello World');
+  axios.post('https://api.openai.com/v1/engines/davinci/jobs', {
+    prompt: msg.text,
+    max_tokens: 100
+  }, {
+    headers: {
+      'Authorization': `Bearer ${openai_api_key}`,
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(response => {
+    const responseText = response.data.choices[0].text;
+    bot.sendMessage(chatId, responseText);
+  })
+  .catch(error => {
+    console.error(error);
+    bot.sendMessage(chatId, 'An error occured, please try again later.');
+  });
 });
