@@ -46,3 +46,4 @@ bot.on('message', (msg) => {
   console.log(`Intent: ${intent}`);
   console.log(`Entities: ${entities}`);
 });
+
